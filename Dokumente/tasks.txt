@@ -1,0 +1,28 @@
+Raum
+- Anzahl Spieler x
+- Anzahl AIs x
+- max. Raumanzahl o
+- bei Spielende -> Raum löschen x
+- Lobby Design x
+- Raum beitreten o
+AI x
+Farbmarkierungen x
+Website
+- Start x
+- Hilfe x
+- Impressum x
+- Design x
+Diplbuch
+- Inhaltsverzeichnis x
+- schreiben x
+Grafiken
+- Spielfiguren (mind. 4) xxxx
+- Boden x
+- Loch x
+
+Spiel
+- 2-Spieler o
+- 4-Spieler o
+- online o
+- gehen/entfernen unterscheiden o
+- starten o
