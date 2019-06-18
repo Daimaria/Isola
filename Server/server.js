@@ -46,19 +46,23 @@ class GameroomDefinition{
         this.numberOfPlayers = numberOfPlayers;
         this.numberOfHumans = numberOfHumans;
         this.humanPlayers = [this.numberOfHumans];
-		this.players = [];
+		this.lastAction = Date.now();
+		this.players = numberOfPlayers===2 
+			? [{id: null, out: false, color: 0xff0000, startx: 4, starty: 2},
+			{id: null, out: false, color: 0xffff00, startx: 4, starty: 6}]
+			: [{id: null, out: false, color: 0xff0000, startx: 6, starty: 2},
+			  {id: null, out: false, color: 0xffff00, startx: 6, starty: 10},
+			  {id: null, out: false, color: 0xff00ff, startx: 2, starty: 6},
+			  {id: null, out: false, color: 0x00ffff, startx: 10, starty: 6}];
         this.humanPlayersJoined = 0;
 		this.over = false;
+		this.started = false;
         if(this.numberOfPlayers == 2){
             this.levelData = this.createLevelData(9);
         }
         else {
             this.levelData = this.createLevelData(13);
         }
-		
-		for(let i = 0; i < numberOfPlayers-numberOfHumans; i++){
-			this.addNewPlayer('AI'+i, false);
-		}
     }
 
     createLevelData(size){
@@ -78,65 +82,22 @@ class GameroomDefinition{
         return a;
     }
 
-    addNewPlayer(id, human) {
+    addNewPlayer(id, human, pos) {
         if(human) {
 			this.humanPlayers[this.humanPlayersJoined] = id;
-			this.players.push({id: id, out: false});
-			switch(this.humanPlayersJoined){
-				case 0:
-					if(this.numberOfPlayers == 2){
-						this.levelData[4][2].player = id;
-					}
-					else {
-						this.levelData[6][2].player = id;
-					}
-				break;
-				case 1:
-					if(this.numberOfPlayers == 2){
-						this.levelData[4][6].player = id;
-					}
-					else {
-						this.levelData[6][10].player = id;
-					}
-				break;
-				case 2:
-					this.levelData[2][6].player = id;
-				break;
-				case 3:
-					this.levelData[10][6].player = id;
-				break;
-			}
+			let set = false;
+			this.players.forEach(player => {
+				if(player.id === null && !set){
+					player.id = id;
+					this.levelData[player.startx][player.starty].player = id;
+					set = true;
+				}
+			});
 			this.humanPlayersJoined++;
 		}
 		else {
-			//ais = numberOfAIs - AIsJoined
-			let ais = (this.numberOfPlayers - this.numberOfHumans) - (this.players.length - this.humanPlayersJoined);
-			this.players.push({id: id, out: false});
-			switch(ais){
-				case 0: break;
-				case 1:
-					if(this.numberOfPlayers == 2){
-						this.levelData[4][6].player = id;
-					}
-					else {
-						this.levelData[10][6].player = id;
-					}
-				break;
-				case 2:
-					if(this.numberOfPlayers == 2){
-						this.levelData[4][2].player = id;
-					}
-					else {
-						this.levelData[2][6].player = id;
-					}
-				break;
-				case 3:
-					this.levelData[6][10].player = id;
-				break;
-				case 4:
-					this.levelData[6][2].player = id;
-				break;
-			}
+			this.players[pos].id = id;
+			this.levelData[this.players[pos].startx][this.players[pos].starty].player = id;
 		}
     }
 }
@@ -194,6 +155,11 @@ io.on('connection', function (socket) {
 		if(gameRooms.length < maxRooms){
 			let grd = new GameroomDefinition(data.numberOfPlayers, data.numberOfHumans);
 			grd.ID = gameRooms.length +1;
+			if(data.aipos && data.aipos.length > 0){
+				for(let i = 0; i < data.aipos.length; i++){
+					grd.addNewPlayer('ai'+i, false, data.aipos[i]);
+				}
+			}
 			gameRooms.push(grd);
 			io.emit('available_gamerooms', { data: gameRooms });
 			console.log("* new gameroom: " + grd.ID + " created");
@@ -223,7 +189,7 @@ io.on('connection', function (socket) {
                     console.log("there is a free place in the room");
                     // there is a free place in the room
                     roomToJoin.addNewPlayer(socket.id, true);
-                    
+                    roomToJoin.lastAction = Date.now();
                     // This player is now in a game.
                     socket.isInGame = true;
                     // Add a basic object that tracks player position to the list of players, using
@@ -240,10 +206,12 @@ io.on('connection', function (socket) {
                     //let dataToSend = preparePlayersDataToSend();
                     // Tell the client that they successfully joined the game.
                     socket.emit('join_game_success', {data: roomToJoin});
+					io.emit('available_gamerooms', { data: gameRooms });
 					//check if room is full and ready to start the game
-					let currentPlayer;
+					let currentPlayer = 0;
 					if(roomToJoin.humanPlayersJoined === roomToJoin.numberOfHumans) {
 						currentPlayer = roomToJoin.players[0];
+						roomToJoin.started = true;
 					}
 					
 					io.in('game-room' + data.roomID).emit('new_player', {data: roomToJoin, currentPlayer: currentPlayer});
@@ -266,6 +234,7 @@ io.on('connection', function (socket) {
         //find current room
 		let currentRoom = findCurrentRoom(gameRooms, socket.gameRoom);
 		if(currentRoom && !currentRoom.over){
+			currentRoom.lastAction = Date.now();
 			//check whether field to go to is ok
 			for(let i = data.y-1; i <= data.y+1; i++){
 				for(let j = data.x-1; j <= data.x+1; j++){
@@ -291,6 +260,7 @@ io.on('connection', function (socket) {
             }
         }*/
         if(currentRoom && !currentRoom.over) {
+			currentRoom.lastAction = Date.now();
             console.log("currentRoom found");
             currentRoom.levelData[data.x][data.y].type = 1;
 			let currentPlayer = findPlayer(currentRoom, socket.id)+1 < currentRoom.players.length
@@ -304,6 +274,8 @@ io.on('connection', function (socket) {
 						io.in('game-room'+currentRoom.ID).emit('game_over', {loser: currentRoom.players[findPlayer(currentRoom, socket.id)]});
 						currentRoom.over = true;
 						console.log('Game over');
+						gameRooms.splice(gameRooms.indexOf(currentRoom),1);
+						io.emit('available_gamerooms', { data: gameRooms });
 					}
 				}
 				//check wether next player can still move
@@ -334,6 +306,11 @@ io.on('connection', function (socket) {
 		//let dataToSend = preparePlayersDataToSend();
 		//io.in('game-room').emit('remove_success', dataToSend);
 	});
+	
+	socket.on('leaving_room', function () {
+		socket.isInGame = false;
+		socket.gameRoom = null;
+	});
 
     // When a client socket disconnects (closes the page, refreshes, timeout etc.),
     // then this event will automatically be triggered.
@@ -345,47 +322,52 @@ io.on('connection', function (socket) {
             delete players[socket.id];*/
 			let currentRoom = findCurrentRoom(gameRooms, socket.gameRoom);
 			if(currentRoom){
-				for(let i = 0; i < currentRoom.humanPlayers.length; i++){
-					if(currentRoom.humanPlayers[i] === socket.id) {
-						currentRoom.humanPlayers[i] = 0;
-					}
+				if(currentRoom.started){
+					io.in('game-room'+socket.gameRoom).emit('destroy_room', {player: socket.id});
+					gameRooms.splice(gameRooms.indexOf(socket.gameRoom),1);
+					io.emit('available_gamerooms', { data: gameRooms });
 				}
-				for(let i = 0; i < currentRoom.players.length; i++){
-					if(currentRoom.players[i] === socket.id) {
-						currentRoom.players.splice(i,1);
-					}
-				}
-				for(var i = 0; i < currentRoom.levelData.length; i++){
-					for(var j = 0; j < currentRoom.levelData.length; j++){
-						if(currentRoom.levelData[i][j].player === socket.id){
-							currentRoom.levelData[i][j].player = 0;
+				else {
+					for(let i = 0; i < currentRoom.humanPlayers.length; i++){
+						if(currentRoom.humanPlayers[i] === socket.id) {
+							currentRoom.humanPlayers[i] = 0;
 						}
 					}
+					for(let i = 0; i < currentRoom.players.length; i++){
+						if(currentRoom.players[i].id === socket.id) {
+							currentRoom.players[i].id = null;
+						}
+					}
+					for(var i = 0; i < currentRoom.levelData.length; i++){
+						for(var j = 0; j < currentRoom.levelData.length; j++){
+							if(currentRoom.levelData[i][j].player === socket.id){
+								currentRoom.levelData[i][j].player = 0;
+							}
+						}
+					}
+					currentRoom.humanPlayersJoined--;
+					io.in('game-room'+socket.gameRoom).emit('remove_player', {data: currentRoom, player: socket.id});
 				}
-				currentRoom.humanPlayersJoined--;
 			}
-            // This player was in a game and has disconnected, but the other players still in the game don't know that.
-            // We need to tell the other players to remove the sprite for this player from their clients.
-            // All of the players still in the game are in the room called 'game-room', so emit an event called 'remove_player'
-            // to that room, sending with it the key of the property to remove.
-            io.in('game-room'+socket.gameRoom).emit('remove_player', socket.id);
         }
     });
 });
 
-/*
+
 // How often to send game updates. Faster paced games will require a lower value for emitRate,
 // so that updates are sent more often. Do some research and test what works for your game.
-var emitRate = 100;
+var emitRate = 60000;
 // This is what I call an 'emitter'. It is used to continuously send updates of the game world to all relevant clients.
 setInterval(function () {
-    // Prepare the positions of the players, ready to send to all players.
-    var dataToSend = preparePlayersDataToSend();
-
-    // Send the data to all clients in the room called 'game-room'.
-    io.in('game-room').emit('state_update', dataToSend);
+    gameRooms.forEach(room => {
+		if(Date.now()-room.lastAction >= 300000){
+			io.in('game-room'+room.ID).emit('destroy_room', {timeUp: true});
+			gameRooms.splice(gameRooms.indexOf(room),1);
+			io.emit('available_gamerooms', { data: gameRooms });
+		}
+	});
 }, emitRate);
-*/
+
 function preparePlayersDataToSend() {
     // Prepare the positions of the players, ready to send to all players.
     var dataToSend = [];

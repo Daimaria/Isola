@@ -51,6 +51,7 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('greenTile', '../../assets/green_tile.png');
         this.load.image('redTile', '../../assets/red_tile.png');
         this.load.image('heroTile', '../../assets/hero_tile.png');
+		this.load.image('colorMarker', '../../assets/color.png');
         this.load.spritesheet('blueJewel', '../../assets/jewel_blue1.png', {frameWidth: 64, frameHeight: 64});
         this.load.spritesheet('lavaBubble', '../../assets/lava_bubble.png', {frameWidth: 64, frameHeight: 64});
 		this.load.crossOrigin='Anonymous';

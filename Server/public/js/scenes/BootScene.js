@@ -63,21 +63,6 @@ export default class BootScene extends Phaser.Scene {
 				that.isConnected = true;
 			});
 
-			this.socket.on('remove_player', function (data) {
-				console.log("");
-				console.log("* * * remove_player event received from server.");
-				// Check that the 'playerSprites' object exists on whatever the context is for '_this'.
-				if(that.playerSprites !== undefined){
-					// Check that the player sprite to remove is actually in the list of player sprites.
-					if(that.playerSprites[data]){
-						// Destroy the player sprite for the player to remove.
-						that.playerSprites[data].destroy();
-						// Delete the property for that player.
-						delete that.playerSprites[data];
-					}
-				}
-			});
-
 			this.socket.on('state_update', function (data) {
 				that.isConnected = true;
 				//console.log("* * * state_update event received from server.");
