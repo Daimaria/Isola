@@ -31,6 +31,11 @@ export default class BootScene extends Phaser.Scene {
 				console.log("* Data was also sent:");
 				console.log(data);
 				that.isConnected = true;
+				/*let oldId = this.getCookie("socket_id");
+				if(oldId.length > 0){
+					socket.emit("reconnecting", {old_id: oldId});
+				}
+				this.setCookie("socket_id", socket.id, 7);*/
 			});
 
 			this.socket.on('how_are_you', function () {
@@ -63,13 +68,13 @@ export default class BootScene extends Phaser.Scene {
 				that.isConnected = true;
 			});
 
-			this.socket.on('state_update', function (data) {
+			/*this.socket.on('state_update', function (data) {
 				that.isConnected = true;
 				//console.log("* * * state_update event received from server.");
 				// Uncomment the below code in an editor, save it and restart the client (refresh the page) to see the emitter output.
-				/*updateCount += 1;
+				updateCount += 1;
 				console.log("");
-				console.log("* * * state_update event received from server. Update count: " + updateCount);*/
+				console.log("* * * state_update event received from server. Update count: " + updateCount);
 			
 				// The server sent the positions of each player with this event. Update the position of each player's sprite.
 				// Check that the 'playerSprites' object exists on whatever the context is for '_this'.
@@ -90,7 +95,7 @@ export default class BootScene extends Phaser.Scene {
 					that.levelData = data[1].level;
 				}
 			
-			});
+			});*/
 
 			this.socket.on('connect_error', function() {
 				console.log('int: Failed to connect to server');
@@ -132,5 +137,28 @@ export default class BootScene extends Phaser.Scene {
 
 	getIsConnected(){
 		return this.isConnected;
+	}
+	
+	setCookie(cname, cvalue, exdays) {
+		var d = new Date();
+		d.setTime(d.getTime() + (exdays*24*60*60*1000));
+		var expires = "expires="+ d.toUTCString();
+		document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+	}
+	
+	getCookie(cname) {
+		var name = cname + "=";
+		var decodedCookie = decodeURIComponent(document.cookie);
+		var ca = decodedCookie.split(';');
+		for(var i = 0; i <ca.length; i++) {
+			var c = ca[i];
+			while (c.charAt(0) == ' ') {
+				c = c.substring(1);
+			}
+			if (c.indexOf(name) == 0) {
+				return c.substring(name.length, c.length);
+			}
+		}
+		return "";
 	}
 }

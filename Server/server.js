@@ -216,6 +216,11 @@ io.on('connection', function (socket) {
 					
 					io.in('game-room' + data.roomID).emit('new_player', {data: roomToJoin, currentPlayer: currentPlayer});
                     console.log("* " + socket.username + " joined a game.");
+					/*if(currentPlayer != 0 && currentPlayer.id.startsWith("ai")){
+						setTimeout(() => {
+							movePlayer(true, null, currentPlayer.id, socket.gameRoom);
+						},1000);
+					}*/
                     // check if room is complete
 
                     // if so -> start the game
@@ -229,10 +234,27 @@ io.on('connection', function (socket) {
             console.log("* " + socket.username + " is already in a game.");
         }
     });
+	
+	socket.on('ready', function () {
+		let currentRoom = findCurrentRoom(gameRooms, socket.gameRoom);
+		if(currentRoom){
+			console.log("ready");
+			if(currentRoom.players[0].id===socket.id){
+				console.log("start");
+				io.in('game-room' + socket.gameRoom).emit('new_player', {data: currentRoom, currentPlayer: currentRoom.players[0], start: true});
+			}
+			else if(currentRoom.players[0].id.startsWith("ai")){
+				setTimeout(() => {
+					movePlayer(true, null, currentRoom.players[0].id, socket.gameRoom);
+				},1000);
+			}
+		}
+	});
 
     socket.on('move_player', function (data) {
+		movePlayer(false, data, socket.id, socket.gameRoom);
         //find current room
-		let currentRoom = findCurrentRoom(gameRooms, socket.gameRoom);
+		/*let currentRoom = findCurrentRoom(gameRooms, socket.gameRoom);
 		if(currentRoom && !currentRoom.over){
 			currentRoom.lastAction = Date.now();
 			//check whether field to go to is ok
@@ -247,18 +269,13 @@ io.on('connection', function (socket) {
 					}
 				}
 			}
-		}
+		}*/
     });
 	
 	socket.on('remove_field', function (data) {
         console.log("remove_field");
-        let currentRoom = findCurrentRoom(gameRooms, socket.gameRoom);
-        /*for(var i = 0; i < gameRooms.length; i ++) {
-            if(gameRooms[i].ID === data.roomID){
-                currentRoom = gameRooms[i];
-                i = gameRooms.length;
-            }
-        }*/
+		removeField(false, data, socket.id, socket.gameRoom);
+        /*let currentRoom = findCurrentRoom(gameRooms, socket.gameRoom);
         if(currentRoom && !currentRoom.over) {
 			currentRoom.lastAction = Date.now();
             console.log("currentRoom found");
@@ -301,17 +318,68 @@ io.on('connection', function (socket) {
         }
         else {
             console.log("currentRoom not found");
-        }
+        }*/
 		//levelData[data.x][data.y].type = 1;
 		//let dataToSend = preparePlayersDataToSend();
 		//io.in('game-room').emit('remove_success', dataToSend);
 	});
 	
-	socket.on('leaving_room', function () {
+	socket.on('leaving_room', function (data) {
+		if(data && data.exiting){
+			let currentRoom = findCurrentRoom(gameRooms, socket.gameRoom);
+			if(currentRoom){
+				if(currentRoom.started){
+					io.in('game-room'+socket.gameRoom).emit('destroy_room', {player: socket.id});
+					gameRooms.splice(gameRooms.indexOf(socket.gameRoom),1);
+					io.emit('available_gamerooms', { data: gameRooms });
+				}
+				else {
+					for(let i = 0; i < currentRoom.humanPlayers.length; i++){
+						if(currentRoom.humanPlayers[i] === socket.id) {
+							currentRoom.humanPlayers[i] = 0;
+						}
+					}
+					for(let i = 0; i < currentRoom.players.length; i++){
+						if(currentRoom.players[i].id === socket.id) {
+							currentRoom.players[i].id = null;
+						}
+					}
+					for(var i = 0; i < currentRoom.levelData.length; i++){
+						for(var j = 0; j < currentRoom.levelData.length; j++){
+							if(currentRoom.levelData[i][j].player === socket.id){
+								currentRoom.levelData[i][j].player = 0;
+							}
+						}
+					}
+					currentRoom.humanPlayersJoined--;
+					io.in('game-room'+socket.gameRoom).emit('remove_player', {data: currentRoom, player: socket.id});
+				}
+			}
+		}
+		socket.leave('game-room'+socket.gameRoom);
 		socket.isInGame = false;
 		socket.gameRoom = null;
 	});
 
+	socket.on('reconnecting', function (data) {
+		gameRooms.forEach(room => {
+			room.humanPlayers.forEach(player => {
+				if(player === data.old_id){
+					room.lastAction = Date.now();
+					player = socket.id;
+					room.players[findPlayer(room, data.old_id)].id = socket.id;
+					pos = findPlayerPos(room, data.old_id);
+					room.levelData[pos.i][pos.j].player = socket.id;
+					socket.isInGame = true;
+					socket.gameRoom = room.ID;
+					socket.join('game-room'+socket.gameRoom);
+					socket.emit('join_game_success', {data: room});
+					io.in('game-room'+socket.gameRoom).emit('reconnected', {data: room, player: socket.id});
+					return;
+				}
+			});
+		});
+	});
     // When a client socket disconnects (closes the page, refreshes, timeout etc.),
     // then this event will automatically be triggered.
     socket.on('disconnecting', function () {
@@ -405,35 +473,164 @@ function isOut(currentRoom, currentPlayer){
 	else return false;
 }
 
-function moveBest(currentRoom, id) {
-	let pos = findPlayerPos(currentRoom, id);
-	let water = 8;
-	let target = {};
-	for(let i = pos.i-1; i <= pos.i+1; i++){
-		for(let j = pos.j-1; j <= pos.j+1; j++){
-			if(!currentRoom.levelData[i][j].player){
-				if(countWater(i, j, currentRoom) < water){
-					water = countWater(i, j, currentRoom);
-					target.i = i;
-					target.j = j;
+function movePlayer(isAI, data, id, room) {
+	//find current room
+	if(isAI) console.log("AI moving");
+	let currentRoom = findCurrentRoom(gameRooms, room);
+	//console.log(currentRoom);
+	if(isAI) {
+		data = moveBest(currentRoom, id);
+		console.log('Field found: ' + data.x + " " + data.y + ", Type " + currentRoom.levelData[data.x][data.y].type);
+	}
+	if(currentRoom && !currentRoom.over){
+		currentRoom.lastAction = Date.now();
+		//check whether field to go to is ok
+		for(let i = data.x-1; i <= data.x+1; i++){
+			for(let j = data.y-1; j <= data.y+1; j++){
+				if(currentRoom.levelData[i][j].player === id && !(i === data.x && j === data.y)) {
+					//move player
+					currentRoom.levelData[data.x][data.y].player = id;
+					currentRoom.levelData[i][j].player = 0;
+					//tell everyone in room about movement and next move
+					io.in('game-room'+currentRoom.ID).emit('player_moved', {data: currentRoom});
+					if(isAI) removeField(isAI, data, id, room);
+					return;
 				}
 			}
 		}
 	}
+}
+
+function removeField(isAI, data, id, room) {
+	if(isAI) console.log("AI removing");
+	let currentRoom = findCurrentRoom(gameRooms, room);
+	if(currentRoom && !currentRoom.over) {
+		if(isAI){
+			data = removeBest(currentRoom, id);
+			console.log(data.x + ":" + data.y);
+		}
+		currentRoom.lastAction = Date.now();
+		console.log("currentRoom found");
+		currentRoom.levelData[data.x][data.y].type = 1;
+		//set next player as current player
+		let currentPlayer = findPlayer(currentRoom, id)+1 < currentRoom.players.length
+			? currentRoom.players[findPlayer(currentRoom, id)+1]
+			: currentRoom.players[0];
+		while(isOut(currentRoom, currentPlayer)){
+			currentRoom.players[findPlayer(currentRoom, currentPlayer.id)].out = true;
+			if(playersOut(currentRoom) === currentRoom.numberOfPlayers-2){
+				if(isOut(currentRoom, id)){
+					currentRoom.players[findPlayer(currentRoom, id)].out = true;
+					io.in('game-room'+currentRoom.ID).emit('game_over', {loser: currentRoom.players[findPlayer(currentRoom, id)]});
+					currentRoom.over = true;
+					console.log('Game over');
+					gameRooms.splice(gameRooms.indexOf(currentRoom),1);
+					io.emit('available_gamerooms', { data: gameRooms });
+				}
+			}
+			//check wether next player can still move
+			if(playersOut(currentRoom) === currentRoom.numberOfPlayers-1){
+				io.in('game-room'+currentRoom.ID).emit('game_over', {loser: currentRoom.players[findPlayer(currentRoom, currentPlayer.id)]});
+				currentRoom.over = true;
+				console.log('Game over');
+				break;
+			}
+			else {
+				//Tell next player he's out
+				console.log('Player out');
+				io.in('game-room'+currentRoom.ID).emit('player_out', {player: currentPlayer});
+				//set next player to player after that
+				currentPlayer = findPlayer(currentRoom, currentPlayer.id)+1 < currentRoom.players.length
+					? currentRoom.players[findPlayer(currentRoom, currentPlayer.id)+1]
+					: currentRoom.players[0];
+				//shorten the array
+				if(currentPlayer === id) break;
+			}
+		}
+		io.in('game-room'+currentRoom.ID).emit('remove_success', {data: currentRoom, currentPlayer: currentPlayer});
+		if(currentPlayer.id.startsWith('ai') && !currentRoom.over){
+			setTimeout(() => {
+				movePlayer(true, null, currentPlayer.id, room);
+			},1000);
+		}
+	}
+	else {
+		console.log("currentRoom not found");
+	}
+}
+
+function moveBest(currentRoom, id) {
+	console.log("Searching field");
+	let pos = findPlayerPos(currentRoom, id);
+	console.log("Pos: " +pos.i+ ":" +pos.j);
+	let water = 8;
+	let target = {};
+	let best = [];
+	for(let i = pos.i-1; i <= pos.i+1; i++){
+		for(let j = pos.j-1; j <= pos.j+1; j++){
+			console.log(i + ":" + j + " " + currentRoom.levelData[i][j].type);
+			if(!currentRoom.levelData[i][j].player && currentRoom.levelData[i][j].type != 1){
+				let tmp = countWater(i, j, currentRoom);
+				console.log("Counting, " + tmp);
+				if(tmp < water){
+					water = tmp;
+					target.x = i;
+					target.y = j;
+					best = [target];
+				}
+				else if(tmp === water){
+					target.x = i;
+					target.y = j;
+					best.push(target);
+				}
+			}
+		}
+		console.log(" ");
+	}
+	let rand = Math.floor(Math.random() * (best.length));
+	target = best[rand];
+	console.log(rand);
 	return target;
 }
 
 function removeBest(currentRoom, id) {
 	let target;
 	let water = 8;
+	let bestpl = [];
 	currentRoom.players.forEach(player => {
-		if(player.id != id){
-			if(countWater(currentRoom, player.id) < water){
-				water = countWater(currentRoom, player.id);
-				target = moveBest(currentRoom, player.id);
+		if(player.id != id && !player.out){
+			console.log(player.id);
+			let tmp = countWater(currentRoom, player.id);
+			if(tmp < water){
+				water = tmp;
+				bestpl = [player];
+			}
+			else if(tmp === water){
+				bestpl.push(player);
 			}
 		}
 	});
+	let rand = Math.floor(Math.random() * (bestpl.length));
+	target = moveBest(currentRoom, bestpl[rand].id);
+	/*let best = [];
+	currentRoom.players.forEach(player => {
+		if(player.id != id && !player.out){
+			console.log(player.id);
+			let tmp = countWater(currentRoom, player.id);
+			if(tmp < water){
+				water = countWater(currentRoom, player.id);
+				target = moveBest(currentRoom, player.id);
+				best = [target];
+			}
+			else if(tmp === water){
+				target = moveBest(currentRoom, player.id);
+				best.push(target);
+			}
+		}
+	});
+	rand = Math.floor(Math.random() * (best.length));
+	target = best[rand];
+	console.log(rand);*/
 	return target;
 }
 
@@ -447,9 +644,9 @@ function findPlayerPos(currentRoom, id){
 
 function countWater(x, y, currentRoom){
 	let water = 0;
-	for(let i = y-1; i <= y+1; i++){
-		for(let j = x-1; j <= x+1; j++){
-			if(currentRoom.levelData[i][j].type === 1) water++;
+	for(let i = x-1; i <= x+1; i++){
+		for(let j = y-1; j <= y+1; j++){
+			if(currentRoom.levelData[i][j].type === 1 || (i!=x && j!=y && currentRoom.levelData[i][j].player)) water++;
 		}
 	}
 	return water;

@@ -42,6 +42,7 @@ export default class GameScene extends Phaser.Scene {
 		this.levelData = data.data.levelData;
 		this.roomID = data.data.ID;
 		this.players = data.data.players;
+		this.numberOfPlayers = data.data.numberOfPlayers;
 		this.currentPlayer = 0;
 		this.gameOver = false;
 		this.out = false;
@@ -86,6 +87,53 @@ export default class GameScene extends Phaser.Scene {
 			}
 		});
 		
+		this.socket.on('reconnected', function (data) {
+			that.levelData = data.data.levelData;
+			that.roomID = data.data.ID;
+			that.players = data.data.players;
+			this.dialogue.clear(true,true);
+		});
+		
+		this.socket.on('disconnected', function (data) {
+			let dialogueBox = that.add.graphics();
+			dialogueBox.fillStyle(0x009900, 1);
+			dialogueBox.fillRect(100,50,800,520).depth = 100;
+			let title = that.add.text(500, 100, "Warning", {fontFamily: "Arial Black", fontSize: 36, color: "#000000"});
+			title.setOrigin(0.5,0.5).depth = 100;
+			let text1 = that.add.text(500, 200, "A player lost the connection to the game.", {fontFamily: "Arial Black", fontSize: 28, color: "#000000"});
+			text1.setOrigin(0.5,0.5).depth = 100;
+			let text2 = that.add.text(500, 250, "Unless he reconnects within 5 minutes,", {fontFamily: "Arial Black", fontSize: 28, color: "#000000"});
+			text2.setOrigin(0.5,0.5).depth = 100;
+			let text3 = that.add.text(500, 300, "the game will not continue.", {fontFamily: "Arial Black", fontSize: 28, color: "#000000"});
+			text3.setOrigin(0.5,0.5).depth = 100;
+			/*let exitBtn = that.add.graphics();
+			exitBtn.fillStyle(0xff0000,1);
+			exitBtn.fillRect(450, 400, 100, 50).depth = 100;*/
+			let time = that.add.text(500, 460, 'Exiting in 300 seconds', {fontFamily: "Arial Black", fontSize: 18, color: "#000000"}).setOrigin(0.5,0.5).setDepth(100);
+			that.dialogue.addMultiple([dialogueBox, title, text1, text2, text3, time]);
+			/*exitBtn.setInteractive(new Phaser.Geom.Rectangle(450,400,100,50), Phaser.Geom.Rectangle.Contains)
+			.on('pointerdown', () => {
+				clearInterval(countdown);
+				that.socket.emit('leaving_room');
+				that.dialogue.clear(true, true);
+				that.scene.start('LobbyScene');
+				//that.scene.remove('GameScene');
+			});*/
+			let i = 300;
+			let countdown = setInterval(() => {
+				i--;
+				time.setText('Exiting in '+i+' seconds');
+				if(i===0){
+					clearInterval(countdown);
+					that.socket.emit('leaving_room');
+					that.dialogue.clear(true, true);
+					//that.scene.sleep('GameScene');
+					that.scene.start('LobbyScene');
+				}
+			}, 1000);
+			that.dialogue.add(countdown);
+		});
+		
 		this.socket.on('destroy_room', function (data) {
 			let dialogueBox = that.add.graphics();
 			dialogueBox.fillStyle(0x009900, 1);
@@ -102,18 +150,32 @@ export default class GameScene extends Phaser.Scene {
 				let exitBtn = that.add.graphics();
 				exitBtn.fillStyle(0xff0000,1);
 				exitBtn.fillRect(450, 400, 100, 50).depth = 100;
-				that.dialogue.addMultiple(dialogueBox, title, text1, text2, text3, exitBtn);
+				let time = that.add.text(500, 460, 'Exiting in 30 seconds', {fontFamily: "Arial Black", fontSize: 18, color: "#000000"}).setOrigin(0.5,0.5).setDepth(100);
+				that.dialogue.addMultiple([dialogueBox, title, text1, text2, text3, exitBtn, time]);
 				exitBtn.setInteractive(new Phaser.Geom.Rectangle(450,400,100,50), Phaser.Geom.Rectangle.Contains)
 				.on('pointerdown', () => {
+					clearInterval(countdown);
 					that.socket.emit('leaving_room');
 					that.dialogue.clear(true, true);
 					//that.scene.sleep('GameScene');
 					that.scene.start('LobbyScene');
 				});
 				that.currentPlayer = 0;
+				let i = 30;
+				let countdown = setInterval(() => {
+					i--;
+					time.setText('Exiting in '+i+' seconds');
+					if(i===0){
+						clearInterval(countdown);
+						that.socket.emit('leaving_room');
+						that.dialogue.clear(true, true);
+						//that.scene.sleep('GameScene');
+						that.scene.start('LobbyScene');
+					}
+				}, 1000);
 			}
 			else {
-				let text1 = that.add.text(500, 200, "A player disconnected from the game.", {fontFamily: "Arial Black", fontSize: 28, color: "#000000"});
+				let text1 = that.add.text(500, 200, "A player left the game.", {fontFamily: "Arial Black", fontSize: 28, color: "#000000"});
 				text1.setOrigin(0.5,0.5).depth = 100;
 				let text2 = that.add.text(500, 250, "Due to these circumstances,", {fontFamily: "Arial Black", fontSize: 28, color: "#000000"});
 				text2.setOrigin(0.5,0.5).depth = 100;
@@ -122,15 +184,29 @@ export default class GameScene extends Phaser.Scene {
 				let exitBtn = that.add.graphics();
 				exitBtn.fillStyle(0xff0000,1);
 				exitBtn.fillRect(450, 400, 100, 50).depth = 100;
-				that.dialogue.addMultiple(dialogueBox, title, text1, text2, text3, exitBtn);
+				let time = that.add.text(500, 460, 'Exiting in 30 seconds', {fontFamily: "Arial Black", fontSize: 18, color: "#000000"}).setOrigin(0.5,0.5).setDepth(100);
+				that.dialogue.addMultiple([dialogueBox, title, text1, text2, text3, exitBtn, time]);
 				exitBtn.setInteractive(new Phaser.Geom.Rectangle(450,400,100,50), Phaser.Geom.Rectangle.Contains)
 				.on('pointerdown', () => {
+					clearInterval(countdown);
 					that.socket.emit('leaving_room');
 					that.dialogue.clear(true, true);
 					that.scene.start('LobbyScene');
 					//that.scene.remove('GameScene');
 				});
 				that.currentPlayer = 0;
+				let i = 30;
+				let countdown = setInterval(() => {
+					i--;
+					time.setText('Exiting in '+i+' seconds');
+					if(i===0){
+						clearInterval(countdown);
+						that.socket.emit('leaving_room');
+						that.dialogue.clear(true, true);
+						//that.scene.sleep('GameScene');
+						that.scene.start('LobbyScene');
+					}
+				}, 1000);
 			}
 		});
 		
@@ -143,16 +219,26 @@ export default class GameScene extends Phaser.Scene {
 			else that.currentPlayer = 0;
 			//that.players.pop();
 			that.drawBoard();
-			that.playersToTop();
+			//that.playersToTop();
 			toBeRemoved = false;
 		});
 		
 		this.socket.on('new_player', function(data){
+			console.log(data);
 			that.levelData = data.data.levelData;
 			that.roomID = data.data.ID;
 			that.players = data.data.players;
 			that.currentPlayer = data.currentPlayer;
-			that.drawPlayers();
+			console.log(data.start);
+			if(!data.start) that.drawPlayers();
+			let joined = 0;
+			that.players.forEach(player => {
+				if(player.id) joined++;
+			});
+			if(joined === that.numberOfPlayers && that.currentPlayer===0){
+				that.socket.emit('ready');
+				console.log("ready");
+			}
 		});
 		
 		this.socket.on('player_moved', function(data){
@@ -214,14 +300,20 @@ export default class GameScene extends Phaser.Scene {
 		var isoPt= new Phaser.Geom.Point();
 		this.drawBoard();
 		isoPt=this.cartesianToIsometric(new Phaser.Geom.Point(1*tileWidth,2*tileWidth));
-		/*lava = this.add.sprite(isoPt.x+borderOffset.x + 20, isoPt.y+borderOffset.y-wallHeight, 'lavaBubble').setOrigin(0, 0);
-		lava.anims.play('right', true);
-		lava.depth = 100;*/
+		let joined = 0;
+		this.players.forEach(player => {
+			if(player.id) joined++;
+		})
+		if(joined === this.numberOfPlayers && this.currentPlayer===0){
+			this.socket.emit('ready');
+			console.log("ready");
+		}
 	}
 	
 	drawBoard() {
 		//normText.text = "drawBoard";
 		gameScene.clear(true,true);
+		this.playerGroup.clear(true,true);
 		this.dialogue.clear(true,true);
 		let isoPt;
 		let tileType=0;
@@ -231,28 +323,79 @@ export default class GameScene extends Phaser.Scene {
 			{
 				tileType=this.levelData[i][j].type;
 				this.drawTileIso(tileType,i,j);
-				if(this.levelData[i][j].player && !toBeRemoved){
+				if(this.levelData[i][j].player){
+					console.log('board');
 					isoPt=this.cartesianToIsometric(new Phaser.Geom.Point(i*tileWidth,j*tileWidth));
 					let colTmp = this.add.sprite(isoPt.x+borderOffset.x + 20, isoPt.y+borderOffset.y-wallHeight, 'colorMarker').setOrigin(0, -0.15);
 					this.players.forEach(player => {
 						if(player.id === this.levelData[i][j].player){
 							colTmp.setTint(player.color);
-							console.log(player.color);
+							if(player.id === this.currentPlayer.id){
+								colTmp.clearAlpha();
+							}
+							else if(this.currentPlayer === 0 && player.color === 0xff0000) {
+								colTmp.clearAlpha();
+							}
+							else {
+								colTmp.setAlpha(0.4);
+							}
 						}
 					});
-					colTmp.depth = 100;
+					colTmp.depth = 99;
 					this.playerGroup.add(colTmp);
 					let tmp = this.add.sprite(isoPt.x+borderOffset.x + 20, isoPt.y+borderOffset.y-wallHeight, 'blueJewel').setOrigin(0, 0);
 					this.playerSprites.push(tmp);
 					this.playerSprites[this.playerSprites.length-1].anims.play('left', true);
 					this.playerGroup.add(tmp);
-					console.log('addPlayer ' + i + ' ' + j);
 					this.playerSprites[this.playerSprites.length-1].depth = 100;
 					//console.log(tmp);
 				}
 			}
 		}
-		console.log(this.playerSprites);
+		let that = this;
+		this.exit = this.add.graphics();
+		this.exit.fillStyle(0xff0000,1);
+		this.exit.fillRect(800,50,100,50);
+		this.exit.setInteractive(new Phaser.Geom.Rectangle(800,50,100,50), Phaser.Geom.Rectangle.Contains);
+		this.exit.on('pointerdown', () => {
+			if(that.gameOver || that.out || that.currentPlayer === 0){
+				that.socket.emit('leaving_room', {exiting: true});
+				that.dialogue.clear(true, true);
+				that.scene.start('LobbyScene');
+			}
+			else {
+				let dialogueBox = that.add.graphics();
+				dialogueBox.fillStyle(0x009900, 1);
+				dialogueBox.fillRect(100,50,800,520).depth = 100;
+				let title = that.add.text(500, 100, "Warning", {fontFamily: "Arial Black", fontSize: 36, color: "#000000"});
+				title.setOrigin(0.5,0.5).depth = 100;
+				let text1 = that.add.text(500, 200, "If you leave a running game,", {fontFamily: "Arial Black", fontSize: 28, color: "#000000"});
+				text1.setOrigin(0.5,0.5).depth = 100;
+				let text2 = that.add.text(500, 250, "the whole game can not continue.", {fontFamily: "Arial Black", fontSize: 28, color: "#000000"});
+				text2.setOrigin(0.5,0.5).depth = 100;
+				let text3 = that.add.text(500, 300, "Do you really want to leave?", {fontFamily: "Arial Black", fontSize: 28, color: "#000000"});
+				text3.setOrigin(0.5,0.5).depth = 100;
+				let exitBtn = that.add.graphics();
+				exitBtn.fillStyle(0xff0000,1);
+				exitBtn.fillRect(390, 400, 100, 50).setDepth(100);
+				let backBtn = that.add.graphics();
+				backBtn.fillStyle(0x0000ff,1);
+				backBtn.fillRect(510, 400, 100, 50).setDepth(100);
+				that.dialogue.addMultiple([dialogueBox, title, text1, text2, text3, exitBtn, backBtn]);
+				exitBtn.setInteractive(new Phaser.Geom.Rectangle(390,400,100,50), Phaser.Geom.Rectangle.Contains)
+				.on('pointerdown', () => {
+					console.log("exit");
+					that.socket.emit('leaving_room', {exiting: true});
+					that.dialogue.clear(true, true);
+					that.scene.start('LobbyScene');
+				});
+				backBtn.setInteractive(new Phaser.Geom.Rectangle(510,400,100,50), Phaser.Geom.Rectangle.Contains)
+				.on('pointerdown', () => {
+					that.dialogue.clear(true, true);
+					console.log("back");
+				});
+			}
+		});
 	}
 	
 	drawPlayers() {
@@ -269,16 +412,23 @@ export default class GameScene extends Phaser.Scene {
 					this.players.forEach(player => {
 						if(player.id === this.levelData[i][j].player){
 							colTmp.setTint(player.color);
-							console.log(player.color);
+							if(player.id === this.currentPlayer.id){
+								colTmp.clearAlpha();
+							}
+							else if(this.currentPlayer === 0 && player.color === 0xff0000) {
+								colTmp.clearAlpha();
+							}
+							else{
+								colTmp.setAlpha(0.4);
+							}
 						}
 					});
-					colTmp.depth = 100;
+					colTmp.depth = 99;
 					this.playerGroup.add(colTmp);
 					let tmp = this.add.sprite(isoPt.x+borderOffset.x + 20, isoPt.y+borderOffset.y-wallHeight, 'blueJewel').setOrigin(0, 0);
 					this.playerSprites.push(tmp);
 					this.playerSprites[this.playerSprites.length-1].anims.play('left', true);
 					this.playerGroup.add(tmp);
-					//console.log('addPlayer ' + i + ' ' + j);
 					this.playerSprites[this.playerSprites.length-1].depth = 100;
 				}
 			}
@@ -299,20 +449,25 @@ export default class GameScene extends Phaser.Scene {
 		var bj;
 		var isoPt= new Phaser.Geom.Point();//It is not advisable to create point in update loop
 		var cartPt=new Phaser.Geom.Point();//This is here for better code readability.
-		cartPt.x=j*tileWidth;
-		cartPt.y=i*tileWidth;
+		cartPt.x=i*tileWidth;
+		cartPt.y=j*tileWidth;
 		isoPt=this.cartesianToIsometric(cartPt);
 		let that = this;
 		//console.log('Draw ' + i + ' ' + j);
 		switch(tileType){
 			case 0:
-				tmp = this.add.sprite(isoPt.x+borderOffset.x, isoPt.y+borderOffset.y-wallHeight, 'floor').setOrigin(0, 0).setInteractive();
+				let poly = new Phaser.Geom.Polygon([isoPt.x+borderOffset.x, isoPt.y+26+borderOffset.y-wallHeight, isoPt.x+51+borderOffset.x, isoPt.y+borderOffset.y-wallHeight, isoPt.x+103+borderOffset.x, isoPt.y+26+borderOffset.y-wallHeight, isoPt.x+51+borderOffset.x, isoPt.y+51+borderOffset.y-wallHeight]);
+				tmp = this.add.sprite(isoPt.x+borderOffset.x, isoPt.y+borderOffset.y-wallHeight, 'floor').setOrigin(0, 0)
+					.setInteractive(/*new Phaser.Geom.Polygon(poly.points,true), Phaser.Geom.Polygon.Contains*/);
+				/*let test = this.add.graphics();
+				test.fillStyle(0x0000ff);
+				test.fillPoints(poly.points, true).depth = 50;*/
 				gameScene.add(tmp);
 				tmp.setData('x', i);
 				tmp.setData('y', j);
 				tmp.on('pointerover', function (event) {
 					if(that.currentPlayer != 0 && that.currentPlayer.id === that.socket.id){
-						if(toBeRemoved && !that.levelData[this.getData('y')][this.getData('x')].player) {
+						if(toBeRemoved && !that.levelData[this.getData('x')][this.getData('y')].player) {
 							this.setTint(0x0000ff);
 							marker.x = this.x;
 							marker.y = this.y;
@@ -338,7 +493,7 @@ export default class GameScene extends Phaser.Scene {
 						pdCoords.y = this.getData("y");
 						//normText2.text='pdCoords: '+pdCoords.x +','+pdCoords.y;
 						//lava.anims.pause();
-						if(toBeRemoved && !that.levelData[this.getData('y')][this.getData('x')].player){
+						if(toBeRemoved && !that.levelData[this.getData('x')][this.getData('y')].player){
 							that.playerSprites.forEach(player => {
 								player.anims.pause();
 							});
@@ -364,9 +519,9 @@ export default class GameScene extends Phaser.Scene {
 	}
 	
 	isNextToPlayer(x, y){
-		if(this.levelData[y][x].player) return false;
-		for(let i = y-1; i <= y+1; i++){
-			for(let j = x-1; j <= x+1; j++){
+		if(this.levelData[x][y].player) return false;
+		for(let i = x-1; i <= x+1; i++){
+			for(let j = y-1; j <= y+1; j++){
 				if(this.levelData[i][j].player === this.socket.id) return true;
 			}
 		}
