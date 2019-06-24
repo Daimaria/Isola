@@ -3,17 +3,20 @@
 
     <head>
         <meta charset="utf-8">
-        <script src="/socket.io/socket.io.js"></script>
-        <script src="js/phaser.min.js"></script>
-        <script src="js/phaser-list-view.js"></script>
-        <script src="js/scenes/BootScene.js" type="module"></script>
-        <script src="js/scenes/PreloadScene.js" type="module"></script>
-        <script src="js/game.js" type="module"></script>
+		<link rel="stylesheet" href="css/index.css">
+		<title>Isola - Home</title>
     </head>
 
     <body>
-        <div id="gameContainer"></div>
-        <script src="js/game.js" type="module"></script>
+		<div class="placeholder"></div>
+		<h1>ISOLA</h1>
+		<div>
+			<input type="image" src="assets/startbtn.png" alt="Start" onclick="location.href='./website/start.html'">
+			<input type="image" src="assets/tutbtn.png" alt="Tutorial" onclick="location.href='./website/tutorial.html'">
+		</div>
+		<div class="second">
+			<input type="image" src="assets/infobtn.png"  alt="Info" onclick="location.href='./website/impressum.html'">
+		</div>
     </body>
 
 </html>
