@@ -63,7 +63,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 	create() {
 		console.log("create LobbyScene");
-
 		this.newGame = this.add.image(550, 32, 'btn-new-game')
 			.setOrigin(0, 0)
 			.setInteractive({useHandCursor: true})

@@ -298,6 +298,8 @@ export default class GameScene extends Phaser.Scene {
 
 	createLevel(){
 		var isoPt= new Phaser.Geom.Point();
+		this.theme = 3;
+		this.add.sprite(0,0, 'bg'+this.theme).setOrigin(0.3,0.2).setScale(1.5);
 		this.drawBoard();
 		isoPt=this.cartesianToIsometric(new Phaser.Geom.Point(1*tileWidth,2*tileWidth));
 		let joined = 0;
@@ -457,7 +459,7 @@ export default class GameScene extends Phaser.Scene {
 		switch(tileType){
 			case 0:
 				let poly = new Phaser.Geom.Polygon([isoPt.x+borderOffset.x, isoPt.y+26+borderOffset.y-wallHeight, isoPt.x+51+borderOffset.x, isoPt.y+borderOffset.y-wallHeight, isoPt.x+103+borderOffset.x, isoPt.y+26+borderOffset.y-wallHeight, isoPt.x+51+borderOffset.x, isoPt.y+51+borderOffset.y-wallHeight]);
-				tmp = this.add.sprite(isoPt.x+borderOffset.x, isoPt.y+borderOffset.y-wallHeight, 'floor').setOrigin(0, 0)
+				tmp = this.add.sprite(isoPt.x+borderOffset.x, isoPt.y+borderOffset.y-wallHeight, 'floor'+this.theme).setOrigin(0, 0)
 					.setInteractive(/*new Phaser.Geom.Polygon(poly.points,true), Phaser.Geom.Polygon.Contains*/);
 				/*let test = this.add.graphics();
 				test.fillStyle(0x0000ff);
@@ -500,6 +502,7 @@ export default class GameScene extends Phaser.Scene {
 							console.log('pdCoords: '+pdCoords.x +','+pdCoords.y);
 							console.log(that.roomID);
 							that.socket.emit('remove_field', {roomID: that.roomID, x: pdCoords.x, y: pdCoords.y});
+							if(markerSprite) markerSprite.destroy();
 						}
 						else {
 							if(that.isNextToPlayer(this.getData("x"), this.getData("y"))){
@@ -512,8 +515,8 @@ export default class GameScene extends Phaser.Scene {
 				});
 			break;
 			case 1:
-				tmp = this.add.sprite(isoPt.x+borderOffset.x, isoPt.y+borderOffset.y-wallHeight, 'water').setOrigin(0, 0).setInteractive();
-				gameScene.add(tmp);
+				//tmp = this.add.sprite(isoPt.x+borderOffset.x, isoPt.y+borderOffset.y-wallHeight, 'water').setOrigin(0, 0).setInteractive();
+				//gameScene.add(tmp);
 			break;
 		}
 	}

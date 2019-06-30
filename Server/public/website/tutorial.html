@@ -9,15 +9,69 @@
 
     <body>
 		<div class="placeholder"></div>
-		<h1>ISOLA</h1>
-		<div>
-			<input type="image" src="../assets/homebtn.png" alt="Home" onclick="location.href='../index.html'">
-			<input type="image" src="../assets/startbtn.png" alt="Start" onclick="location.href='./start.html'">
+		<div class="content">
+			<div class="first">
+				<img src="../assets/buttons/logo_01.png" alt="Logo" />
+			</div>
+			<div class="second">
+				<input type="image" src="../assets/buttons/homebtn_01.png" alt="Home" onclick="location.href='../index.html'">
+				<input type="image" src="../assets/buttons/startbtn_01.png" alt="Start" onclick="location.href='./start.html'">
+			</div>
+			<div class="third">
+				<input type="image" src="../assets/buttons/infobtn_01.png"  alt="Info" onclick="location.href='./impressum.html'">
+			</div>
+			<h1>ISOLA</h1>
+			<div class="tablinks">
+				<button type="button" class="tablink" onclick="openTab(event, 'gen')" id="default">General</button>
+				<button type="button" class="tablink" onclick="openTab(event, 'move')">Movement</button>
+				<button type="button" class="tablink" onclick="openTab(event, 'win')">Winning Conditions</button><button type="button" class="tablink" onclick="openTab(event, 'room')">Rooms</button>
+				<button type="button" class="tablink" onclick="openTab(event, 'gen')" disabled>TBA</button></div>
+			<div id="gen" class="tab">
+				<h3>General</h3>
+				<p>
+					In this turn-based game your goal is to trap your opponents on a single field and be the last person that can still move.<br/>
+					To take part in a game, you have to join a room that still has empty spaces. The game starts when enough players have entered the room. There are two-player and four-player rooms to choose from.<br/>
+					To distinguish the different players, they are marked with colors[image]. The player whose turn it is has a stronger color that the others. <br/>
+				</p>
+			</div>
+			<div id="move" class="tab">
+				<h3>Movement</h3>
+				<p>
+					When your turn starts, you first have to move. You can move to any unoccupied adjacent field, both straight and diagonal. The green Marker shows you wether a field is valid or not. [clip]<br/>
+					After you moved your character, you need to remove one field. This can be any unoccupied field across the whole board. The blue marker shows you wether a field is valid or not. [clip]<br/>
+					As soon as you removed a field, your turn is over and the next player has to make his/her move.
+				</p>
+			</div>
+			<div id="win" class="tab">
+				<h3>Winning Conditions</h3>
+				<p>
+					To win, you need to be the last person who is still able to move. If there are two players (in two-player-mode) trapped on three connected fields, the player who removes the unoccupied field wins, since he was the last one to finish a complete turn. [image/clip]
+				</p>
+			</div>
+			<div id="room" class="tab">
+				<h3>Rooms</h3>
+				<p>
+					Only ten rooms can exist at the same time. Therefore, if there is no action inside a room for more than five minutes, the room will be shut down to make space for more active rooms. Actions that reset this timer are: a new player joining the room, moving to a field, and removin a field.<br/>
+					If you press the "New Game"-button, you can create a new room. You can decide the following settings: Number of total players (2 or 4), number of computer opponents, and the starting position of the computer opponents. [images]
+				</p>
+			</div>
 		</div>
-		<div class="second">
-			<input type="image" src="../assets/infobtn.png"  alt="Info" onclick="location.href='./impressum.html'">
-		</div>
-		<p>This is the tutorial to the game ISOLA</p>
+		<script>
+			document.getElementById('default').click();
+			
+			function openTab(event, name) {
+				let tabs = document.getElementsByClassName('tab');
+				let tabls = document.getElementsByClassName('tablink');
+				for(let i = 0; i < tabs.length; i++){
+					tabs[i].style.display = 'none';
+				}
+				for(let i = 0; i < tabls.length; i++){
+					tabls[i].className = tabls[i].className.replace(" active", "");
+				}
+				document.getElementById(name).style.display = 'block';
+				event.currentTarget.className += ' active';
+			}
+		</script>
     </body>
 
 </html>
