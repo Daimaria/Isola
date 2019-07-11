@@ -1,14 +1,34 @@
 body {
 	/*background-image: url("../assets/background.png");*/
-	background-color: #330000;
 	/*background-repeat: repeat-x;
 	background-size: 1px 300px;*/
 	margin: 0;
+}
+
+body.space {
+	background-color: #737373;
+	color: black;
+}
+
+body.water {
+	background-color: #ffff80;
+	color: black;
+}
+
+body.lava {
+	background-color: #330000;
 	color: white;
 }
 
 .content {
 	margin: 0 50px 20px 50px;
+	height: 100%;
+}
+
+.footer {
+	bottom: 0;
+	position: fixed;
+	width: 100%;
 }
 
 canvas {
@@ -27,11 +47,22 @@ h3 {
 .placeholder {
 	width: 100%;
 	height: 100px;
-	background-image: url('../assets/background/background_03.jpg');
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: center;
 	overflow: hidden;
+}
+
+.placeholder.space {
+	background-image: url('../assets/background/background_01.jpg');
+}
+
+.placeholder.water {
+	background-image: url('../assets/background/background_02.jpg');
+}
+
+.placeholder.lava {
+	background-image: url('../assets/background/background_03.jpg');
 }
 
 .first {
@@ -60,12 +91,59 @@ div input {
 
 .tab {
 	display: none;
+	background-color: rgba(166, 166, 166, 0.6);
+	padding: 20px;
+	color: black;
 }
 
-.tablinks button{
+.tab p {
+	text-align: left;
+}
+
+.tab ul {
+	text-align: left;
+}
+
+.pictures {
+	display: flex;
+	justify-content: center;
+}
+
+.pictures .pic {
+	margin: 10px;
+}
+
+.pic {
+	display: table;
+	margin: 10px auto;
+}
+
+.pic span {
+	display: table-caption;
+	caption-side: bottom;
+	padding: 10px;
+}
+
+.tablinks {
+	background-color: rgba(166, 166, 166, 0.6);
+	display: flex;
+}
+
+.tablinks button {
+	background-color: rgba(166, 166, 166, 0);
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 14px 16px;
+	transition: 0.3s;
+	flex-grow: 1;
+}
+
+/* Change background color of buttons on hover */
+.tablinks button:hover {
 	background-color: #ddd;
 }
 
 .tablinks button.active {
-	background-color: #ccc;
+	background-color: #a6a6a6;
 }

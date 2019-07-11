@@ -17,16 +17,65 @@
 		<div class="placeholder"></div>
 		<div class="content">
 			<div class="first">
-				<img src="../assets/buttons/logo_01.png" alt="Logo" />
+				<img id='logo' alt="Logo" />
 			</div>
 			<div class="second">
-				<input type="image" src="../assets/buttons/homebtn_01.png" alt="Home" onclick="location.href='../index.html'">
-				<input type="image" src="../assets/buttons/infobtn_01.png" alt="Start" onclick="location.href='./start.html'">
+				<input id="home" type="image" alt="Home" onclick="location.href='../index.html'">
+				<input id="info" type="image" alt="Info" onclick="location.href='./impressum.html'">
 			</div>
 			<div class="third">
-				<input type="image" src="../assets/buttons/tutbtn_01.png"  alt="Tutorial" onclick="location.href='./tutorial.html'">
+				<input id="tut" type="image" alt="Tutorial" onclick="location.href='./tutorial.html'">
 			</div>
 		</div>
+		<div class="footer" style="display: none">
+			<input type="radio" name="theme" value="1" onclick="changeTheme('1', 'start')"/>Space
+			<input type="radio" name="theme" value="2" onclick="changeTheme('2', 'start')"/>Water
+			<input type="radio" name="theme" value="3" onclick="changeTheme('3', 'start')"/>Lava
+		</div>
+		<script>
+			window.onload = function() {
+				let theme = sessionStorage.getItem('theme')||1;
+				let radio = document.getElementsByName('theme');
+				radio.forEach(button => {
+					if(button.value === theme){
+						button.checked = true;
+					}
+				});
+				changeTheme(theme, 'start');
+			}
+			function changeTheme(id, page){
+				sessionStorage.setItem('theme', ''+id);
+				switch(id){
+					case '1': 
+						document.getElementsByTagName('body')[0].className = 'space';
+						document.getElementsByClassName('placeholder')[0].className = 'placeholder space';
+						document.getElementById('logo').src = "../assets/buttons/logo_01.png";
+						if(page != 'start') document.getElementById('start').src = "../assets/buttons/startbtn_01.png";
+						if(page != 'tut') document.getElementById('tut').src = "../assets/buttons/tutbtn_01.png";
+						if(page != 'info') document.getElementById('info').src = "../assets/buttons/infobtn_01.png";
+						if(page != 'home') document.getElementById('home').src = "../assets/buttons/homebtn_01.png";
+						break;
+					case '2': 
+						document.getElementsByTagName('body')[0].className = 'water';
+						document.getElementsByClassName('placeholder')[0].className = 'placeholder water';
+						document.getElementById('logo').src = "../assets/buttons/logo_02.png";
+						if(page != 'start') document.getElementById('start').src = "../assets/buttons/startbtn_02.png";
+						if(page != 'tut') document.getElementById('tut').src = "../assets/buttons/tutbtn_02.png";
+						if(page != 'info') document.getElementById('info').src = "../assets/buttons/infobtn_02.png";
+						if(page != 'home') document.getElementById('home').src = "../assets/buttons/homebtn_02.png";
+						break;
+					case '3': 
+						document.getElementsByTagName('body')[0].className = 'lava';
+						document.getElementsByClassName('placeholder')[0].className = 'placeholder lava';
+						document.getElementById('logo').src = "../assets/buttons/logo_03.png";
+						if(page != 'start') document.getElementById('start').src = "../assets/buttons/startbtn_03.png";
+						if(page != 'tut') document.getElementById('tut').src = "../assets/buttons/tutbtn_03.png";
+						if(page != 'info') document.getElementById('info').src = "../assets/buttons/infobtn_03.png";
+						if(page != 'home') document.getElementById('home').src = "../assets/buttons/homebtn_03.png";
+						break;
+				}
+			}
+		</script>
         <script src="../js/game.js" type="module"></script>
     </body>
 

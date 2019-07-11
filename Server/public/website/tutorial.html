@@ -11,52 +11,160 @@
 		<div class="placeholder"></div>
 		<div class="content">
 			<div class="first">
-				<img src="../assets/buttons/logo_01.png" alt="Logo" />
+				<img id="logo" alt="Logo" />
 			</div>
 			<div class="second">
-				<input type="image" src="../assets/buttons/homebtn_01.png" alt="Home" onclick="location.href='../index.html'">
-				<input type="image" src="../assets/buttons/startbtn_01.png" alt="Start" onclick="location.href='./start.html'">
+				<input id="home" type="image" alt="Home" onclick="location.href='../index.html'">
+				<input id="start" type="image" alt="Start" onclick="location.href='./start.html'">
 			</div>
 			<div class="third">
-				<input type="image" src="../assets/buttons/infobtn_01.png"  alt="Info" onclick="location.href='./impressum.html'">
+				<input id="info" type="image" alt="Info" onclick="location.href='./impressum.html'">
 			</div>
 			<h1>ISOLA</h1>
 			<div class="tablinks">
 				<button type="button" class="tablink" onclick="openTab(event, 'gen')" id="default">General</button>
 				<button type="button" class="tablink" onclick="openTab(event, 'move')">Movement</button>
-				<button type="button" class="tablink" onclick="openTab(event, 'win')">Winning Conditions</button><button type="button" class="tablink" onclick="openTab(event, 'room')">Rooms</button>
-				<button type="button" class="tablink" onclick="openTab(event, 'gen')" disabled>TBA</button></div>
+				<button type="button" class="tablink" onclick="openTab(event, 'win')">Winning Conditions</button>
+				<button type="button" class="tablink" onclick="openTab(event, 'room')">Rooms</button>
 			<div id="gen" class="tab">
 				<h3>General</h3>
 				<p>
 					In this turn-based game your goal is to trap your opponents on a single field and be the last person that can still move.<br/>
-					To take part in a game, you have to join a room that still has empty spaces. The game starts when enough players have entered the room. There are two-player and four-player rooms to choose from.<br/>
-					To distinguish the different players, they are marked with colors[image]. The player whose turn it is has a stronger color that the others. <br/>
+					To take part in a game, you have to join a room that still has empty spaces. The game starts when enough players have entered the room. There are two-player and four-player rooms to choose from.
 				</p>
+				<div class="pictures">
+					<div class="pic">
+						<img src="../assets/tutorial/two_player.PNG" alt="two-player room"/>
+						<span>A full two-player room.</span>
+					</div>
+					<div class="pic">
+						<img src="../assets/tutorial/four_player.PNG" alt="four-player room"/>
+						<span>A four-player room with two empty spaces and a computer opponent at both the second and fourth position.</span>
+					</div>
+				</div>
+				<p>
+					To distinguish the different players, they are marked with colors. The player whose turn it is has a stronger color that the others.
+				</p>
+				<div class="pictures">
+					<div class="pic">
+						<img src="../assets/tutorial/player_turn.PNG" alt="Your turn"/>
+						<span>It's currently this player's turn.</span>
+					</div>
+					<div class="pic">
+						<img src="../assets/tutorial/player_not.PNG" alt="not your turn"/>
+						<span>This player's turn has already passed.</span>
+					</div>
+				</div>
 			</div>
 			<div id="move" class="tab">
 				<h3>Movement</h3>
 				<p>
-					When your turn starts, you first have to move. You can move to any unoccupied adjacent field, both straight and diagonal. The green Marker shows you wether a field is valid or not. [clip]<br/>
-					After you moved your character, you need to remove one field. This can be any unoccupied field across the whole board. The blue marker shows you wether a field is valid or not. [clip]<br/>
+					When your turn starts, you first have to move. You can move to any unoccupied adjacent field, both straight and diagonal. The green marker shows you wether a field is valid or not.
+				</p>
+				<div class="pic">
+					<img src="../assets/tutorial/move.gif" alt="move-marker"/>
+				</div>
+				<p>
+					After you moved your character, you need to remove one field. This can be any unoccupied field across the whole board. The blue marker shows you wether a field is valid or not.
+				</p>
+				<div class="pic">
+					<img src="../assets/tutorial/del.gif" alt="delete-marker"/>
+				</div>
+				<p>
 					As soon as you removed a field, your turn is over and the next player has to make his/her move.
 				</p>
 			</div>
 			<div id="win" class="tab">
 				<h3>Winning Conditions</h3>
 				<p>
-					To win, you need to be the last person who is still able to move. If there are two players (in two-player-mode) trapped on three connected fields, the player who removes the unoccupied field wins, since he was the last one to finish a complete turn. [image/clip]
+					To win, you need to be the last person who is still able to move. If the last two players are trapped on three connected fields, the player who removes the unoccupied field wins, since he/she was the last one to finish a complete turn.
 				</p>
+				<div class="pic">
+					<img src="../assets/tutorial/win.gif" alt="winning situation"/>
+					<span>In this situation, the yellow elephant is the winner.</span>
+				</div>
 			</div>
 			<div id="room" class="tab">
 				<h3>Rooms</h3>
 				<p>
-					Only ten rooms can exist at the same time. Therefore, if there is no action inside a room for more than five minutes, the room will be shut down to make space for more active rooms. Actions that reset this timer are: a new player joining the room, moving to a field, and removin a field.<br/>
-					If you press the "New Game"-button, you can create a new room. You can decide the following settings: Number of total players (2 or 4), number of computer opponents, and the starting position of the computer opponents. [images]
+					Only 12 rooms can exist at the same time. Therefore, if there is no action inside a room for more than five minutes, the room will be shut down to make space for more active rooms. Actions that reset this timer are: 
+				</p>
+				<ul>
+					<li>a new player joining the room,</li>
+					<li>moving to a field,</li>
+					<li>and removing a field.</li>
+				</ul>
+				<p>
+					If you press the plus button, you can create a new room. You can decide the following settings: Number of total players (2 or 4), number of computer opponents, and the starting position of the computer opponents.
+				</p>
+				<div class="pic">
+					<img src="../assets/tutorial/new.png" alt="New Room"/>
+					<span>Click this button to add a new room.</span>
+				</div>
+				<div class="pictures">
+					<div class="pic">
+						<img src="../assets/tutorial/create.PNG" alt="create two-player room" width="300px"/>
+						<span>A two-player room with only human players.</span>
+					</div>
+					<div class="pic">
+						<img src="../assets/tutorial/create_01.PNG" alt="create four-player room" width="300px"/>
+						<span>A four-player room with the second and third player being computer opponents.</span>
+					</div>
+				</div>
+				<p>
+					After deciding on the settings, press the checkmark to create the room. If you want to return to the lobby without creating the room, press the x-button.<br/>
+					Please be aware that due to the room limit your room might not be created. This might happen if there are more people trying to create a room than currently possible. In that case, those whose creation requests reach the server first will be the lucky ones to have their rooms created.
 				</p>
 			</div>
 		</div>
+		<div class="footer">
+			<input type="radio" name="theme" value="1" onclick="changeTheme('1', 'tut')"/>Space
+			<input type="radio" name="theme" value="2" onclick="changeTheme('2', 'tut')"/>Water
+			<input type="radio" name="theme" value="3" onclick="changeTheme('3', 'tut')"/>Lava
+		</div>
 		<script>
+			window.onload = function() {
+				let theme = sessionStorage.getItem('theme')||1;
+				let radio = document.getElementsByName('theme');
+				radio.forEach(button => {
+					if(button.value === theme){
+						button.checked = true;
+					}
+				});
+				changeTheme(theme, 'tut');
+			}
+			function changeTheme(id, page){
+				sessionStorage.setItem('theme', ''+id);
+				switch(id){
+					case '1': 
+						document.getElementsByTagName('body')[0].className = 'space';
+						document.getElementsByClassName('placeholder')[0].className = 'placeholder space';
+						document.getElementById('logo').src = "../assets/buttons/logo_01.png";
+						if(page != 'start') document.getElementById('start').src = "../assets/buttons/startbtn_01.png";
+						if(page != 'tut') document.getElementById('tut').src = "../assets/buttons/tutbtn_01.png";
+						if(page != 'info') document.getElementById('info').src = "../assets/buttons/infobtn_01.png";
+						if(page != 'home') document.getElementById('home').src = "../assets/buttons/homebtn_01.png";
+						break;
+					case '2': 
+						document.getElementsByTagName('body')[0].className = 'water';
+						document.getElementsByClassName('placeholder')[0].className = 'placeholder water';
+						document.getElementById('logo').src = "../assets/buttons/logo_02.png";
+						if(page != 'start') document.getElementById('start').src = "../assets/buttons/startbtn_02.png";
+						if(page != 'tut') document.getElementById('tut').src = "../assets/buttons/tutbtn_02.png";
+						if(page != 'info') document.getElementById('info').src = "../assets/buttons/infobtn_02.png";
+						if(page != 'home') document.getElementById('home').src = "../assets/buttons/homebtn_02.png";
+						break;
+					case '3': 
+						document.getElementsByTagName('body')[0].className = 'lava';
+						document.getElementsByClassName('placeholder')[0].className = 'placeholder lava';
+						document.getElementById('logo').src = "../assets/buttons/logo_03.png";
+						if(page != 'start') document.getElementById('start').src = "../assets/buttons/startbtn_03.png";
+						if(page != 'tut') document.getElementById('tut').src = "../assets/buttons/tutbtn_03.png";
+						if(page != 'info') document.getElementById('info').src = "../assets/buttons/infobtn_03.png";
+						if(page != 'home') document.getElementById('home').src = "../assets/buttons/homebtn_03.png";
+						break;
+				}
+			}
 			document.getElementById('default').click();
 			
 			function openTab(event, name) {

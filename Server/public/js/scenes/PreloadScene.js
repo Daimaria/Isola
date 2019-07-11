@@ -48,9 +48,22 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('water', '../../assets/water5.png');
         this.load.image('marker', '../../assets/blocks/marker.png');
         this.load.image('btn-join-game', '../../assets/buttons/btn-join-game.png');
+		this.load.image('btn-watch-game', '../../assets/buttons/btn-watch-game.png');
         this.load.image('btn-new-game', '../../assets/buttons/btn-new-game.png');
         this.load.image('btn-join-game2', '../../assets/buttons/btn-join-game_2.png');
         this.load.image('btn-join-game4', '../../assets/buttons/btn-join-game_4.png');
+		this.load.image('new-sign-01', '../../assets/buttons/addbtn_01.png');
+		this.load.image('new-sign-02', '../../assets/buttons/addbtn_02.png');
+		this.load.image('new-sign-03', '../../assets/buttons/addbtn_03.png');
+		this.load.image('warn-sign-01', '../../assets/buttons/warnbtn_01.png');
+		this.load.image('warn-sign-02', '../../assets/buttons/warnbtn_02.png');
+		this.load.image('warn-sign-03', '../../assets/buttons/warnbtn_03.png');
+		this.load.image('add-player', '../../assets/ui/add_players.png');
+		this.load.image('person', '../../assets/ui/person.png');
+		this.load.image('computer', '../../assets/ui/computer.png');
+		this.load.image('exit', '../../assets/ui/exit.png');
+		this.load.image('exit-square', '../../assets/ui/exit_square.png');
+		this.load.image('play', '../../assets/ui/play.png');
         this.load.image('connect-icon', '../../assets/blocks/connect-icon.png');
         this.load.image('disconnect-icon', '../../assets/blocks/disconnect-icon.png');
         this.load.image('greenTile', '../../assets/green_tile.png');
@@ -59,6 +72,10 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('colorMarker', '../../assets/blocks/color.png');
         this.load.spritesheet('blueJewel', '../../assets/jewel_blue1.png', {frameWidth: 64, frameHeight: 64});
         this.load.spritesheet('lavaBubble', '../../assets/lava_bubble.png', {frameWidth: 64, frameHeight: 64});
+		this.load.spritesheet('cow', '../../assets/players/cow.png', {frameWidth: 105, frameHeight: 100});
+		this.load.spritesheet('pig', '../../assets/players/pig.png', {frameWidth: 105, frameHeight: 100});
+		this.load.spritesheet('elephant', '../../assets/players/elephant.png', {frameWidth: 105, frameHeight: 100});
+		this.load.spritesheet('caterpillar', '../../assets/players/raupe.png', {frameWidth: 105, frameHeight: 100});
 		this.load.crossOrigin='Anonymous';
 		//load all necessary assets
 		//this.load.bitmapFont('font', 'https://dl.dropboxusercontent.com/s/z4riz6hymsiimam/font.png?dl=0', 'https://dl.dropboxusercontent.com/s/7caqsovjw5xelp0/font.xml?dl=0');

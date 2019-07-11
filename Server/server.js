@@ -1,3 +1,4 @@
+try{
 // Gathering dependencies. The require(...) bit imports the stuff that was installed through npm.
 var express = require('express');
 // Create an Express app. Socket.io just sits on top of Express, but Express itself isn't
@@ -48,12 +49,12 @@ class GameroomDefinition{
         this.humanPlayers = [this.numberOfHumans];
 		this.lastAction = Date.now();
 		this.players = numberOfPlayers===2 
-			? [{id: null, out: false, color: 0xff0000, startx: 4, starty: 2},
-			{id: null, out: false, color: 0xffff00, startx: 4, starty: 6}]
-			: [{id: null, out: false, color: 0xff0000, startx: 6, starty: 2},
-			  {id: null, out: false, color: 0xffff00, startx: 6, starty: 10},
-			  {id: null, out: false, color: 0xff00ff, startx: 2, starty: 6},
-			  {id: null, out: false, color: 0x00ffff, startx: 10, starty: 6}];
+			? [{id: null, out: false, color: 0xff0000, char: '', dir: 7, startx: 4, starty: 2},
+			{id: null, out: false, color: 0xffff00, char: '', dir: 3, startx: 4, starty: 6}]
+			: [{id: null, out: false, color: 0xff0000, char: '', dir: 7, startx: 6, starty: 2},
+			  {id: null, out: false, color: 0xffff00, char: '', dir: 3, startx: 6, starty: 10},
+			  {id: null, out: false, color: 0xff00ff, char: '', dir: 1, startx: 2, starty: 6},
+			  {id: null, out: false, color: 0x00ffff, char: '', dir: 5, startx: 10, starty: 6}];
         this.humanPlayersJoined = 0;
 		this.over = false;
 		this.started = false;
@@ -83,6 +84,8 @@ class GameroomDefinition{
     }
 
     addNewPlayer(id, human, pos) {
+		let chars = ['cow', 'elephant', 'pig', 'caterpillar'];
+		let zuf = Math.floor(Math.random() * 4);
         if(human) {
 			this.humanPlayers[this.humanPlayersJoined] = id;
 			let set = false;
@@ -90,6 +93,7 @@ class GameroomDefinition{
 				if(player.id === null && !set){
 					player.id = id;
 					this.levelData[player.startx][player.starty].player = id;
+					player.char = chars[zuf];
 					set = true;
 				}
 			});
@@ -98,12 +102,13 @@ class GameroomDefinition{
 		else {
 			this.players[pos].id = id;
 			this.levelData[this.players[pos].startx][this.players[pos].starty].player = id;
+			this.players[pos].char = chars[zuf];
 		}
     }
 }
 
 let gameRooms = [];
-let maxRooms = 10;
+let maxRooms = 12;
 
 io.on('connection', function (socket) {
   console.log("* * * A new connection has been made.");
@@ -491,12 +496,47 @@ function movePlayer(isAI, data, id, room) {
 					//move player
 					currentRoom.levelData[data.x][data.y].player = id;
 					currentRoom.levelData[i][j].player = 0;
+					//set direction for sprite
+					currentRoom.players[findPlayer(currentRoom, id)].dir = newDirection(data.x, data.y, i, j);
 					//tell everyone in room about movement and next move
 					io.in('game-room'+currentRoom.ID).emit('player_moved', {data: currentRoom});
 					if(isAI) removeField(isAI, data, id, room);
 					return;
 				}
 			}
+		}
+	}
+}
+
+function newDirection(x, y, oldx, oldy) {
+	if(x < oldx){
+		if(y < oldy){
+			return 4;
+		}
+		else if(y > oldy){
+			return 6;
+		}
+		else {
+			return 5;
+		}
+	}
+	else if(x > oldx){
+		if(y < oldy){
+			return 2;
+		}
+		else if(y > oldy){
+			return 0;
+		}
+		else {
+			return 1;
+		}
+	}
+	else {
+		if(y < oldy){
+			return 3;
+		}
+		else if(y > oldy){
+			return 7;
 		}
 	}
 }
@@ -600,12 +640,14 @@ function removeBest(currentRoom, id) {
 	currentRoom.players.forEach(player => {
 		if(player.id != id && !player.out){
 			console.log(player.id);
-			let tmp = countWater(currentRoom, player.id);
+			let pos = findPlayerPos(currentRoom, player.id);
+			let tmp = countWater(pos.i, pos.j, currentRoom);
+			console.log(tmp);
 			if(tmp < water){
 				water = tmp;
 				bestpl = [player];
 			}
-			else if(tmp === water){
+			else if(tmp === water && water != 8){
 				bestpl.push(player);
 			}
 		}
@@ -665,4 +707,8 @@ function playersOut(currentRoom){
 	}
 	console.log(tmp);
 	return tmp;
+}
+}
+catch(error) {
+	console.log("Error: "+error);
 }
