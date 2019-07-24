@@ -157,7 +157,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('create_new_gameroom', function(data) {
-		if(gameRooms.length < maxRooms){
+		if(gameRooms.length < maxRooms && data.numberOfHumans > 0){
 			let grd = new GameroomDefinition(data.numberOfPlayers, data.numberOfHumans);
 			grd.ID = gameRooms.length +1;
 			if(data.aipos && data.aipos.length > 0){

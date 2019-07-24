@@ -147,6 +147,7 @@ export default class LobbyScene extends Phaser.Scene {
 		console.log("createGamePressed");
 		this.dialogue = this.add.group();
 		let numPlayers = 2;
+		let numAI = 0;
 		let ai1 = false;
 		let ai2 = false;
 		let ai3 = false;
@@ -198,30 +199,36 @@ export default class LobbyScene extends Phaser.Scene {
 			if(ai1){
 				p1.setTexture('person');
 				ai1 = false;
+				numAI--;
 			}
-			else{
+			else if(numPlayers-numAI > 1){
 				p1.setTexture('computer');
 				ai1 = true;
+				numAI++;
 			}
 		});
 		p2.on('pointerdown', () => {
 			if(ai2){
 				p2.setTexture('person');
 				ai2 = false;
+				numAI--;
 			}
-			else{
+			else if(numPlayers-numAI > 1){
 				p2.setTexture('computer')
 				ai2 = true;
+				numAI++;
 			}
 		});
 		p3.on('pointerdown', () => {
 			if(ai3){
 				p3.setTexture('person');
 				ai3 = false;
+				numAI--;
 			}
-			else if(x3.visible){
+			else if(x3.visible && numPlayers-numAI > 1){
 				p3.setTexture('computer');
 				ai3 = true;
+				numAI++;
 			}
 			else {
 				x3.setVisible(true);
@@ -239,10 +246,12 @@ export default class LobbyScene extends Phaser.Scene {
 			if(ai4){
 				p4.setTexture('person');
 				ai4 = false;
+				numAI--;
 			}
-			else if(x4.visible){
+			else if(x4.visible && numPlayers-numAI > 1){
 				p4.setTexture('computer');
 				ai4 = true;
+				numAI++;
 			}
 			else {
 				x3.setVisible(true);
@@ -259,6 +268,8 @@ export default class LobbyScene extends Phaser.Scene {
 		x3.on('pointerdown', () => {
 			//pt3.setVisible(false);
 			//pt4.setVisible(false);
+			if(ai3) numAI--;
+			if(ai4) numAI--;
 			ai3 = false;
 			ai4 = false;
 			x3.setVisible(false);
