@@ -124,7 +124,7 @@
 		</div>
 		<script>
 			window.onload = function() {
-				let theme = sessionStorage.getItem('theme')||1;
+				let theme = sessionStorage.getItem('theme')||'1';
 				let radio = document.getElementsByName('theme');
 				radio.forEach(button => {
 					if(button.value === theme){
