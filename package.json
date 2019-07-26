@@ -2,9 +2,9 @@
   "name": "Isola",
   "version": "1.0.0",
   "description": "",
-  "main": "Server\server.js",
+  "main": "server\\server.js",
   "scripts": {
-    "start": "node server\server.js"
+    "start": "node server\\server.js"
   },
   "author": "Johanna Kucera",
   "dependencies": {
