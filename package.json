@@ -1,24 +1,12 @@
 {
-  "name": "phaser3-project-template",
-  "version": "1.1.0",
-  "description": "A Phaser 3 Project Template",
-  "main": "Server/server.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/photonstorm/phaser3-project-template.git"
+  "name": "Isola",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Server\server.js",
+  "scripts": {
+    "start": "node server\server.js"
   },
-  "author": "Richard Davey <rdavey@gmail.com> (http://www.photonstorm.com)",
-  "license": "MIT",
-  "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
-  "bugs": {
-    "url": "https://github.com/photonstorm/phaser3-project-template/issues"
-  },
-  "homepage": "https://github.com/photonstorm/phaser3-project-template#readme",
-  "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.2.3",
-    "babel-loader": "^8.0.5"
-  },
+  "author": "Johanna Kucera",
   "dependencies": {
     "express": "^4.16.4",
     "phaser": "^3.16.2",
