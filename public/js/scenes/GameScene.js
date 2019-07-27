@@ -63,7 +63,7 @@ export default class GameScene extends Phaser.Scene {
 		this.dialogue = this.add.group();
 		marker = new Phaser.Geom.Point(0, 0);
 
-		this.anims.create({
+		/*this.anims.create({
 			key: 'left',
 			frames: this.anims.generateFrameNumbers('blueJewel', { start: 0, end: 30 }),
 			frameRate: 10,
@@ -74,13 +74,13 @@ export default class GameScene extends Phaser.Scene {
 			frames: this.anims.generateFrameNumbers('lavaBubble', { start: 0, end: 14 }),
 			frameRate: 10,
 			repeat: -1
-		});
+		});*/
 		
 		let that = this;
 
 		this.socket.on('remove_player', function (data) {
-			console.log("");
-			console.log("* * * remove_player event received from server.");
+			//console.log("");
+			//console.log("* * * remove_player event received from server.");
 			if(data.player != that.socket.id){
 				that.levelData = data.data.levelData;
 				that.roomID = data.data.ID;
@@ -178,7 +178,7 @@ export default class GameScene extends Phaser.Scene {
 					}
 				}, 1000);
 			}
-			else {
+			else if(!that.gameOver) {
 				let text1 = that.add.text(500, 230, "A player left the game.", {fontFamily: "Arial Black", fontSize: 28, color: "#000000"});
 				text1.setOrigin(0.5,0.5).depth = 100;
 				let text2 = that.add.text(500, 280, "Due to these circumstances,", {fontFamily: "Arial Black", fontSize: 28, color: "#000000"});
@@ -215,7 +215,7 @@ export default class GameScene extends Phaser.Scene {
 		});
 		
 		this.socket.on('remove_success', function(data){
-			console.log('remove: '+data);
+			//console.log('remove: '+data);
 			that.levelData = data.data.levelData;
 			that.roomID = data.data.ID;
 			that.players = data.data.players;
@@ -228,12 +228,12 @@ export default class GameScene extends Phaser.Scene {
 		});
 		
 		this.socket.on('new_player', function(data){
-			console.log(data);
+			//console.log(data);
 			that.levelData = data.data.levelData;
 			that.roomID = data.data.ID;
 			that.players = data.data.players;
 			that.currentPlayer = data.currentPlayer;
-			console.log(data.start);
+			//console.log(data.start);
 			if(!data.start) that.drawPlayers();
 			let joined = 0;
 			that.players.forEach(player => {
@@ -241,12 +241,12 @@ export default class GameScene extends Phaser.Scene {
 			});
 			if(joined === that.numberOfPlayers && that.currentPlayer===0){
 				that.socket.emit('ready');
-				console.log("ready");
+				//console.log("ready");
 			}
 		});
 		
 		this.socket.on('player_moved', function(data){
-			console.log(data);
+			//console.log(data);
 			that.levelData = data.data.levelData;
 			that.roomID = data.data.ID;
 			that.players = data.data.players;
@@ -257,16 +257,16 @@ export default class GameScene extends Phaser.Scene {
 		this.socket.on('game_over', function(data){
 			that.gameOver = true;
 			if(that.socket.id != data.loser.id && !that.out){
-				console.log('winner');
+				//console.log('winner');
 				normText = that.add.text(500, 360, "You won!", { fontFamily: "Arial Black", fontSize: 36, color: that.theme === '1' ? "#737373" : (that.theme === '2' ? "#ffff80" : "#330000") }).setOrigin(0.5,0.5);
-				normText.setStroke(that.theme === '1' ? "#a6a6a6" : (that.theme === '2' ? "#ffffe6" : "#990000"), 16);
+				normText.setStroke(that.theme === '1' ? "#a6a6a6" : (that.theme === '2' ? "#000000" : "#990000"), 16);
 
 				//  Apply the shadow to the Stroke only
 				normText.setShadow(2, 2, '#333333', 2, true, false);
 				normText.depth = 200;
 			}
 			else {
-				console.log('loser');
+				//console.log('loser');
 				let winner;
 				let col;
 				that.players.forEach(player => {
@@ -277,14 +277,14 @@ export default class GameScene extends Phaser.Scene {
 								break;
 							case 0xffff00: col = 'yellow';
 								break;
-							case 0xff00ff: col = 'turquois';
+							case 0x00ffff: col = 'turquois';
 								break;
-							case 0x0000ff: col = 'pink';
+							case 0xff00ff: col = 'pink';
 						}
 					}
 				});
 				normText = that.add.text(500, 360, "You lost!\n The " + col + " " + winner.char + " won.", { fontFamily: "Arial Black", fontSize: 36, color: that.theme === '1' ? "#737373" : (that.theme === '2' ? "#ffff80" : "#330000") }).setOrigin(0.5,0.5);
-				normText.setStroke(that.theme === '1' ? "#a6a6a6" : (that.theme === '2' ? "#ffffe6" : "#990000"), 16);
+				normText.setStroke(that.theme === '1' ? "#a6a6a6" : (that.theme === '2' ? "#000000" : "#990000"), 16);
 
 				//  Apply the shadow to the Stroke only
 				normText.setShadow(2, 2, '#333333', 2, true, false);
@@ -294,10 +294,10 @@ export default class GameScene extends Phaser.Scene {
 		
 		this.socket.on('player_out', function(data){
 			if(that.socket.id === data.player.id){
-				console.log('out');
+				//console.log('out');
 				that.out = true;
-				normText = that.add.text(500, 360, "You lost!", { fontFamily: "Arial Black", fontSize: 36, color: "#c51b7d" });
-				normText.setStroke('#de77ae', 16);
+				normText = that.add.text(500, 360, "You lost!", { fontFamily: "Arial Black", fontSize: 36, color: that.theme === '1' ? "#737373" : (that.theme === '2' ? "#ffff80" : "#330000") }).setOrigin(0.5,0.5);
+				normText.setStroke(that.theme === '1' ? "#a6a6a6" : (that.theme === '2' ? "#000000" : "#990000"), 16);
 
 				//  Apply the shadow to the Stroke only
 				normText.setShadow(2, 2, '#333333', 2, true, false);
@@ -312,6 +312,8 @@ export default class GameScene extends Phaser.Scene {
 		if(markerMoved) {
 			if(markerSprite) markerSprite.destroy();
 			markerSprite = this.add.sprite(marker.x, marker.y, 'marker').setOrigin(0, 0);
+			if(toBeRemoved) markerSprite.setTint(0x0000ff);
+			else markerSprite.setTint(0x00ff00);
 			markerMoved = false;
 		}
 	}
@@ -328,7 +330,7 @@ export default class GameScene extends Phaser.Scene {
 		})
 		if(joined === this.numberOfPlayers && this.currentPlayer===0){
 			this.socket.emit('ready');
-			console.log("ready");
+			//console.log("ready");
 		}
 	}
 	
@@ -346,7 +348,7 @@ export default class GameScene extends Phaser.Scene {
 				tileType=this.levelData[i][j].type;
 				this.drawTileIso(tileType,i,j);
 				if(this.levelData[i][j].player){
-					console.log('board');
+					//console.log('board');
 					isoPt=this.cartesianToIsometric(new Phaser.Geom.Point(i*tileWidth,j*tileWidth));
 					let colTmp = this.add.sprite(isoPt.x+borderOffset.x + 20, isoPt.y+borderOffset.y-wallHeight, 'colorMarker').setOrigin(0, -0.15);
 					let tmp;
@@ -419,7 +421,7 @@ export default class GameScene extends Phaser.Scene {
 				that.dialogue.addMultiple([dialogueBox, layer, logo, title, text1, text2, text3, exitBtn, backBtn]);
 				exitBtn.setInteractive({useHandCursor: true})
 				.on('pointerdown', () => {
-					console.log("exit");
+					///console.log("exit");
 					that.socket.emit('leaving_room', {exiting: true});
 					that.dialogue.clear(true, true);
 					that.scene.start('LobbyScene');
@@ -427,7 +429,7 @@ export default class GameScene extends Phaser.Scene {
 				backBtn.setInteractive({useHandCursor: true})
 				.on('pointerdown', () => {
 					that.dialogue.clear(true, true);
-					console.log("back");
+					//console.log("back");
 				});
 			}
 		});
@@ -544,15 +546,15 @@ export default class GameScene extends Phaser.Scene {
 							that.playerSprites.forEach(player => {
 								player.anims.pause();
 							});
-							console.log('pdCoords: '+pdCoords.x +','+pdCoords.y);
-							console.log(that.roomID);
+							//console.log('pdCoords: '+pdCoords.x +','+pdCoords.y);
+							//console.log(that.roomID);
 							that.socket.emit('remove_field', {roomID: that.roomID, x: pdCoords.x, y: pdCoords.y});
 							if(markerSprite) markerSprite.destroy();
 						}
 						else {
 							if(that.isNextToPlayer(this.getData("x"), this.getData("y"))){
-								console.log('moveCoords: '+pdCoords.x +','+pdCoords.y);
-								console.log(that.roomID);
+								//console.log('moveCoords: '+pdCoords.x +','+pdCoords.y);
+								//console.log(that.roomID);
 								that.socket.emit('move_player', {roomID: that.roomID, x: pdCoords.x, y: pdCoords.y});
 							}
 						}

@@ -466,14 +466,8 @@ function findCurrentRoom(gameRooms, roomId) {
 
 function isOut(currentRoom, currentPlayer){
 	let water = 0;
-	for(let i = 1; i < currentRoom.levelData.length-1; i++){
-		for(let j = 1; j < currentRoom.levelData.length-1; j++){
-			if(currentRoom.levelData[i][j].player === currentPlayer.id) {
-				water = countWater(i, j, currentRoom);
-				break;
-			}
-		}
-	}
+	let pos = findPlayerPos(currentRoom, currentPlayer);
+	water = countWater(pos.i, pos.j, currentRoom);
 	if(water === 8) return true;
 	else return false;
 }
@@ -556,7 +550,7 @@ function removeField(isAI, data, id, room) {
 		let currentPlayer = findPlayer(currentRoom, id)+1 < currentRoom.players.length
 			? currentRoom.players[findPlayer(currentRoom, id)+1]
 			: currentRoom.players[0];
-		while(isOut(currentRoom, currentPlayer)){
+		while(isOut(currentRoom, currentPlayer.id)){
 			currentRoom.players[findPlayer(currentRoom, currentPlayer.id)].out = true;
 			if(playersOut(currentRoom) === currentRoom.numberOfPlayers-2){
 				if(isOut(currentRoom, id)){

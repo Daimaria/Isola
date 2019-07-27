@@ -36,8 +36,8 @@ export default class PreloadScene extends Phaser.Scene {
         });
         percentText.setOrigin(0.5, 0.5);
         
-        this.load.image("logo", "../../assets/star_gold.png");
-        this.load.image('tile', '../../assets/tile.png');
+        //this.load.image("logo", "../../assets/star_gold.png");
+        //this.load.image('tile', '../../assets/tile.png');
         this.load.image('floor1', '../../assets/blocks/metal_block.png');
         this.load.image('floor2', '../../assets/blocks/wood_block.png');
         this.load.image('floor3', '../../assets/blocks/volcan_block.png');
@@ -45,7 +45,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('bg2', '../../assets/background/background_02.png');
 		this.load.image('bg3', '../../assets/background/background_03.png');
         //this.load.image('floor', '../../assets/hero_tile.png');
-        this.load.image('water', '../../assets/water5.png');
+        //this.load.image('water', '../../assets/water5.png');
         this.load.image('marker', '../../assets/blocks/marker.png');
         this.load.image('btn-join-game', '../../assets/buttons/btn-join-game.png');
 		this.load.image('btn-watch-game', '../../assets/buttons/btn-watch-game.png');
@@ -66,12 +66,12 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('play', '../../assets/ui/play.png');
         this.load.image('connect-icon', '../../assets/blocks/connect-icon.png');
         this.load.image('disconnect-icon', '../../assets/blocks/disconnect-icon.png');
-        this.load.image('greenTile', '../../assets/green_tile.png');
-        this.load.image('redTile', '../../assets/red_tile.png');
-        this.load.image('heroTile', '../../assets/hero_tile.png');
+        //this.load.image('greenTile', '../../assets/green_tile.png');
+        //this.load.image('redTile', '../../assets/red_tile.png');
+        //this.load.image('heroTile', '../../assets/hero_tile.png');
 		this.load.image('colorMarker', '../../assets/blocks/color.png');
-        this.load.spritesheet('blueJewel', '../../assets/jewel_blue1.png', {frameWidth: 64, frameHeight: 64});
-        this.load.spritesheet('lavaBubble', '../../assets/lava_bubble.png', {frameWidth: 64, frameHeight: 64});
+        //this.load.spritesheet('blueJewel', '../../assets/jewel_blue1.png', {frameWidth: 64, frameHeight: 64});
+        //this.load.spritesheet('lavaBubble', '../../assets/lava_bubble.png', {frameWidth: 64, frameHeight: 64});
 		this.load.spritesheet('cow', '../../assets/players/cow.png', {frameWidth: 105, frameHeight: 100});
 		this.load.spritesheet('pig', '../../assets/players/pig.png', {frameWidth: 105, frameHeight: 100});
 		this.load.spritesheet('elephant', '../../assets/players/elephant.png', {frameWidth: 105, frameHeight: 100});
