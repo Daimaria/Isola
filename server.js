@@ -397,7 +397,7 @@ io.on('connection', function (socket) {
 			if(currentRoom){
 				if(currentRoom.started){
 					io.in('game-room'+socket.gameRoom).emit('destroy_room', {player: socket.id});
-					gameRooms.splice(gameRooms.indexOf(socket.gameRoom),1);
+					gameRooms.splice(findCurrentRoom(gameRooms, socket.gameRoom),1);
 					io.emit('available_gamerooms', { data: gameRooms });
 				}
 				else {
