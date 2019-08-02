@@ -159,7 +159,10 @@ io.on('connection', function (socket) {
     socket.on('create_new_gameroom', function(data) {
 		if(gameRooms.length < maxRooms && data.numberOfHumans > 0){
 			let grd = new GameroomDefinition(data.numberOfPlayers, data.numberOfHumans);
-			grd.ID = gameRooms.length +1;
+			grd.ID = gameRooms.length === 0 ? 0 : gameRooms[gameRooms.length-1].ID + 1;
+			if (grd.ID >= 100) {
+				grd.ID = 0;
+			}
 			if(data.aipos && data.aipos.length > 0){
 				for(let i = 0; i < data.aipos.length; i++){
 					grd.addNewPlayer('ai'+i, false, data.aipos[i]);
@@ -335,7 +338,7 @@ io.on('connection', function (socket) {
 			if(currentRoom){
 				if(currentRoom.started){
 					io.in('game-room'+socket.gameRoom).emit('destroy_room', {player: socket.id});
-					gameRooms.splice(gameRooms.indexOf(socket.gameRoom),1);
+					gameRooms.splice(gameRooms.indexOf(currentRoom),1);
 					io.emit('available_gamerooms', { data: gameRooms });
 				}
 				else {
@@ -397,7 +400,7 @@ io.on('connection', function (socket) {
 			if(currentRoom){
 				if(currentRoom.started){
 					io.in('game-room'+socket.gameRoom).emit('destroy_room', {player: socket.id});
-					gameRooms.splice(findCurrentRoom(gameRooms, socket.gameRoom),1);
+					gameRooms.splice(gameRooms.indexOf(currentRoom),1);
 					io.emit('available_gamerooms', { data: gameRooms });
 				}
 				else {
